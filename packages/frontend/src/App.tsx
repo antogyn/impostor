@@ -1,7 +1,6 @@
 import { Component, createEffect, createSignal, onMount, Show } from "solid-js";
 import Home from "./components/Home";
-import Lobby from "./components/Lobby";
-import Game from "./components/Game";
+import Room from "./components/Room";
 import JoinRoom from "./components/JoinRoom";
 import LanguageSelector from "./components/LanguageSelector";
 import { gameState } from "./store";
@@ -60,12 +59,8 @@ const App: Component = () => {
           </div>
         </Show>
 
-        <Show when={gameState.room && gameState.room.status === "waiting"}>
-          <Lobby />
-        </Show>
-
-        <Show when={gameState.room && gameState.room.status === "playing"}>
-          <Game />
+        <Show when={gameState.room}>
+          <Room />
         </Show>
       </div>
     </I18nContext.Provider>

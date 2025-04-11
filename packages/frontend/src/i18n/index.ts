@@ -1,7 +1,22 @@
 import { createContext, useContext, createSignal, createEffect, createMemo } from 'solid-js';
 import * as i18n from '@solid-primitives/i18n';
-import en from './en.ts';
-import fr from './fr.ts';
+import en from './en';
+import fr from './fr';
+
+// Type for the translation dictionary
+type TranslationDictionary = typeof en;
+
+// Create a type for all possible translation paths
+type DotPrefix<T extends string> = T extends '' ? '' : `.${T}`;
+
+type DotNestedKeys<T> = (
+  T extends object 
+    ? { [K in keyof T]: `${K & string}${DotPrefix<DotNestedKeys<T[K]>>}` }[keyof T] 
+    : ''
+);
+
+// Type for all possible translation keys
+type TranslationKey = DotNestedKeys<TranslationDictionary>;
 
 // Define available languages
 export const languages = {
@@ -17,7 +32,7 @@ const dictionaries = {
 
 // Define the context type
 type I18nContextType = {
-  t: (path: string, params?: Record<string, any>) => string;
+  t: (path: TranslationKey, params?: Record<string, any>) => string;
   locale: () => string;
   setLocale: (lang: string) => void;
   availableLanguages: typeof languages;
@@ -54,7 +69,7 @@ export function createI18nProvider() {
   const translator = i18n.translator(dict, i18n.resolveTemplate);
   
   // Create a wrapper function with the correct type
-  const t = (path: string, params?: Record<string, any>): string => {
+  const t = (path: TranslationKey, params?: Record<string, any>): string => {
     return translator(path as any, params) || path;
   };
 
