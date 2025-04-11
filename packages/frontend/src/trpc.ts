@@ -5,7 +5,7 @@ import type { AppRouter } from '../../backend/router';
 const getBaseUrl = () => {
   // In production, use the deployed API URL
   if (import.meta.env.PROD) {
-    return 'https://your-deno-deploy-url.deno.dev';
+    return 'https://antogyn-impostor.deno.dev';
   }
   // In development, use localhost
   return 'http://localhost:8000';
