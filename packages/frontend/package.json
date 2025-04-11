@@ -27,5 +27,8 @@
     "qrcode": "^1.5.4",
     "solid-js": "^1.9.5",
     "zod": "^3.22.4"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.9.5"
   }
 }
