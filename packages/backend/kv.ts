@@ -20,8 +20,11 @@ export async function saveRoom(room: Room): Promise<void> {
 
 // Get a random word from the word list
 async function getRandomWord(language: 'en' | 'fr'): Promise<string> {
+  // Get the directory of the current file
+  const currentDir = new URL('.', import.meta.url).pathname;
+  
   // Read the appropriate word list file
-  const filePath = `./words/${language}.json`;
+  const filePath = `${currentDir}words/${language}.json`;
   const wordList = JSON.parse(await Deno.readTextFile(filePath));
   
   // Select a random word
