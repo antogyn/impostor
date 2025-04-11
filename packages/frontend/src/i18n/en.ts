@@ -41,7 +41,7 @@ export default {
     players: "Players",
     host: "Host",
     you: "You",
-    leaveRoom: "Leave Room",
+    leaveRoom: "Leave",
     startGame: "Start Game",
     restartGame: "Restart Game",
     kick: "Kick",
