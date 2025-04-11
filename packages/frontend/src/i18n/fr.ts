@@ -70,6 +70,7 @@ export default {
     players: "Joueurs",
     host: "Hôte",
     you: "Vous",
+    kick: "Expulser",
     restartGame: "Redémarrer la Partie",
     leaveGame: "Quitter la Partie",
     roomQrCode: "QR Code de la Salle",

@@ -70,6 +70,7 @@ export default {
     players: "Players",
     host: "Host",
     you: "You",
+    kick: "Kick",
     restartGame: "Restart Game",
     leaveGame: "Leave Game",
     roomQrCode: "Room QR Code",

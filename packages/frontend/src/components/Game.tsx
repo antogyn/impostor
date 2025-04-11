@@ -1,6 +1,6 @@
 import { For, Show, createSignal } from 'solid-js';
 import Button from './Button';
-import { gameState, getCurrentPlayer, leaveRoom, isLeavingRoom, startGame, isStartingGame, isHost } from '../store';
+import { gameState, getCurrentPlayer, leaveRoom, isLeavingRoom, startGame, isStartingGame, isHost, kickPlayer, isKickingPlayer } from '../store';
 import { showToast } from './Toast';
 import Modal from './Modal';
 import QRCode from './QRCode';
@@ -8,6 +8,7 @@ import { useI18n } from '../i18n';
 
 export default function Game() {
   const [showQRModal, setShowQRModal] = createSignal(false);
+  const [kickingPlayerId, setKickingPlayerId] = createSignal<string | null>(null);
   const { t } = useI18n();
   
   const handleLeaveRoom = async () => {
@@ -16,6 +17,12 @@ export default function Game() {
 
   const handleRestartGame = async () => {
     await startGame();
+  };
+  
+  const handleKickPlayer = async (playerId: string) => {
+    setKickingPlayerId(playerId);
+    await kickPlayer(playerId);
+    setKickingPlayerId(null);
   };
   
   const getShareUrl = () => {
@@ -29,10 +36,10 @@ export default function Game() {
     
     try {
       await navigator.clipboard.writeText(url);
-      showToast(t('lobby.urlCopied'), 'success');
+      showToast(t('game.urlCopied'), 'success');
     } catch (err) {
       console.error('Failed to copy share URL:', err);
-      showToast(t('lobby.failedToCopyUrl'), 'error');
+      showToast(t('game.failedToCopyUrl'), 'error');
     }
   };
   
@@ -41,10 +48,10 @@ export default function Game() {
     
     try {
       await navigator.clipboard.writeText(gameState.room.id);
-      showToast(t('lobby.idCopied'), 'success');
+      showToast(t('game.idCopied'), 'success');
     } catch (err) {
       console.error('Failed to copy room ID:', err);
-      showToast(t('lobby.failedToCopyId'), 'error');
+      showToast(t('game.failedToCopyId'), 'error');
     }
   };
 
@@ -151,6 +158,17 @@ export default function Game() {
                       </span>
                     )}
                   </div>
+                  
+                  <Show when={isHost() && player.id !== gameState.playerId}>
+                    <Button
+                      onClick={() => handleKickPlayer(player.id)}
+                      variant="danger"
+                      size="sm"
+                      isLoading={isKickingPlayer() && kickingPlayerId() === player.id}
+                    >
+                      {t('game.kick')}
+                    </Button>
+                  </Show>
                 </li>
               )}
             </For>
