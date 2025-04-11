@@ -1,8 +1,8 @@
 import { createSignal } from 'solid-js';
-import Button from './Button.tsx';
-import CreateRoom from './CreateRoom.tsx';
-import JoinRoom from './JoinRoom.tsx';
-import { useI18n } from '../i18n/index.ts';
+import Button from './Button';
+import CreateRoom from './CreateRoom';
+import JoinRoom from './JoinRoom';
+import { useI18n } from '../i18n';
 
 export default function Home() {
   const [view, setView] = createSignal<'menu' | 'create' | 'join'>('menu');

@@ -1,11 +1,11 @@
 import { createSignal, Show } from 'solid-js';
-import Button from './Button.tsx';
-import Input from './Input.tsx';
-import { joinRoom, isJoiningRoom, gameState } from '../store.ts';
-import Modal from './Modal.tsx';
-import QRScanner from './QRScanner.tsx';
-import { showToast } from './Toast.tsx';
-import { useI18n } from '../i18n/index.ts';
+import Button from './Button';
+import Input from './Input';
+import { joinRoom, isJoiningRoom, gameState } from '../store';
+import Modal from './Modal';
+import QRScanner from './QRScanner';
+import { showToast } from './Toast';
+import { useI18n } from '../i18n';
 
 interface JoinRoomProps {
   onBack: () => void;

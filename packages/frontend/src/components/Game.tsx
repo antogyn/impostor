@@ -1,10 +1,10 @@
 import { For, Show, createSignal } from 'solid-js';
-import Button from './Button.tsx';
-import { gameState, getCurrentPlayer, leaveRoom, isLeavingRoom, startGame, isStartingGame, isHost } from '../store.ts';
-import { showToast } from './Toast.tsx';
-import Modal from './Modal.tsx';
-import QRCode from './QRCode.tsx';
-import { useI18n } from '../i18n/index.ts';
+import Button from './Button';
+import { gameState, getCurrentPlayer, leaveRoom, isLeavingRoom, startGame, isStartingGame, isHost } from '../store';
+import { showToast } from './Toast';
+import Modal from './Modal';
+import QRCode from './QRCode';
+import { useI18n } from '../i18n';
 
 export default function Game() {
   const [showQRModal, setShowQRModal] = createSignal(false);
@@ -29,10 +29,10 @@ export default function Game() {
     
     try {
       await navigator.clipboard.writeText(url);
-      showToast(t('game.urlCopied'), 'success');
+      showToast(t('lobby.urlCopied'), 'success');
     } catch (err) {
       console.error('Failed to copy share URL:', err);
-      showToast(t('game.failedToCopyUrl'), 'error');
+      showToast(t('lobby.failedToCopyUrl'), 'error');
     }
   };
   
@@ -41,10 +41,10 @@ export default function Game() {
     
     try {
       await navigator.clipboard.writeText(gameState.room.id);
-      showToast(t('game.idCopied'), 'success');
+      showToast(t('lobby.idCopied'), 'success');
     } catch (err) {
       console.error('Failed to copy room ID:', err);
-      showToast(t('game.failedToCopyId'), 'error');
+      showToast(t('lobby.failedToCopyId'), 'error');
     }
   };
 

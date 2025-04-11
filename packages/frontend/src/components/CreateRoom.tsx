@@ -1,8 +1,8 @@
 import { createSignal } from 'solid-js';
-import Button from './Button.tsx';
-import Input from './Input.tsx';
-import { createRoom, isCreatingRoom, gameState } from '../store.ts';
-import { useI18n } from '../i18n/index.ts';
+import Button from './Button';
+import Input from './Input';
+import { createRoom, isCreatingRoom, gameState } from '../store';
+import { useI18n } from '../i18n';
 
 interface CreateRoomProps {
   onBack: () => void;
