@@ -1,0 +1,14 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-env --allow-read --watch --env --unstable-kv main.ts",
+    "start": "deno run --allow-net --allow-env --allow-read --env --unstable-kv main.ts"
+  },
+  "imports": {
+    "@trpc/server": "npm:@trpc/server@10.45.0",
+    "@trpc/server/": "npm:@trpc/server@10.45.0/",
+    "zod": "npm:zod@3.22.4",
+    "pusher": "npm:pusher@5.2.0",
+    "cors": "npm:cors@2.8.5",
+    "@impostor/shared": "../shared/src/index.ts"
+  }
+}

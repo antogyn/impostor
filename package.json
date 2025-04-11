@@ -1,0 +1,19 @@
+{
+  "name": "impostor",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:backend": "npm run dev --workspace packages/backend",
+    "dev:frontend": "npm run dev --workspace packages/frontend",
+    "build": "npm run build --workspace packages/frontend",
+    "start:backend": "npm run start --workspace packages/backend",
+    "start:frontend": "npm run serve --workspace packages/frontend"
+  },
+  "devDependencies": {
+    "npm-run-all2": "^7.0.2"
+  }
+}
