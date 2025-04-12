@@ -2,6 +2,14 @@
 
 A multiplayer game where one player is the impostor and must blend in with the crewmates.
 
+## Features
+
+- Real-time multiplayer gameplay using Pusher
+- Randomly assigned impostor role
+- Randomly selected starting player
+- Option to prevent the impostor from being the starting player
+- Automatic deletion of inactive rooms after 3 hours
+
 ## Project Structure
 
 This is a monorepo containing:

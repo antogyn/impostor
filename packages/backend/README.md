@@ -9,6 +9,7 @@ A Deno-based backend for the Impostor game, using tRPC, Deno KV, and Pusher for 
 - Start games
 - Kick players
 - Real-time updates via Pusher
+- Automatic deletion of inactive rooms after 3 hours using Deno KV's TTL feature
 
 ## Technologies
 
@@ -63,6 +64,16 @@ The API is built with tRPC and exposed at the `/trpc` endpoint. The following pr
 - `startGame` - Start the game (host only)
 - `kickPlayer` - Kick a player from the room (host only)
 - `getRoom` - Get room details
+
+## Room Auto-Deletion
+
+Rooms are automatically deleted after 3 hours of inactivity using Deno KV's Time To Live (TTL) feature. This helps keep the database clean and prevents accumulation of abandoned rooms.
+
+How it works:
+- When a room is created or updated, a TTL of 3 hours is set
+- Any room activity (joining, leaving, starting a game) resets the TTL
+- If no activity occurs for 3 hours, the room is automatically deleted
+- No manual cleanup or cron jobs are needed
 
 ## Deployment
 

@@ -7,6 +7,7 @@ const kv = await Deno.openKv();
 const ROOM_PREFIX = "room:";
 
 // Get a room by ID
+// Note: If a room hasn't been updated in 3 hours, it will be automatically deleted by the KV store's TTL
 export async function getRoom(roomId: string): Promise<Room | null> {
   const res = await kv.get([ROOM_PREFIX, roomId]);
   return res.value as Room | null;
@@ -15,7 +16,13 @@ export async function getRoom(roomId: string): Promise<Room | null> {
 // Save a room
 export async function saveRoom(room: Room): Promise<void> {
   room.updatedAt = Date.now();
-  await kv.set([ROOM_PREFIX, room.id], room);
+  
+  // Set TTL to 3 hours (10,800,000 milliseconds)
+  const ttlMs = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+  
+  await kv.set([ROOM_PREFIX, room.id], room, {
+    expireIn: ttlMs // This will auto-delete the key after 3 hours
+  });
 }
 
 // Get a random word from the word list

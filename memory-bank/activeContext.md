@@ -15,6 +15,7 @@ The project has been converted to a monorepo structure using npm workspaces. The
 - Created the basic Deno project structure
 - Implemented tRPC API with endpoints for room management
 - Set up Deno KV for state storage
+- Implemented automatic room cleanup using Deno KV's TTL feature
 - Integrated Pusher for real-time updates
 - Added support for loading environment variables from .env files
 - Created comprehensive documentation
@@ -38,6 +39,7 @@ The project has been converted to a monorepo structure using npm workspaces. The
 6. **Join In-Progress Games**: Allow players to join a game that's already in progress (✅ Completed)
 7. **QR Code Sharing**: Add QR code generation and scanning for easier room joining (✅ Completed)
 8. **Localization**: Add support for multiple languages (✅ Completed)
+9. **Room Auto-Deletion**: Implement automatic deletion of inactive rooms (✅ Completed)
 
 ### Short-term Goals
 1. **Enhanced Game Logic**: Add more sophisticated game mechanics
@@ -67,6 +69,7 @@ The project has been converted to a monorepo structure using npm workspaces. The
 - **Type Safety**: Emphasized throughout the project to catch errors at compile time.
 - **Component Reusability**: Created reusable UI components to maintain consistency and reduce duplication.
 - **State Management**: Implemented a centralized store for front-end state management.
+- **Room Cleanup**: Using Deno KV's TTL feature to automatically delete inactive rooms after 3 hours.
 
 ### Open Questions
 - **Scalability**: How will the system perform under load? Will Deno KV be sufficient for larger user bases?
@@ -82,6 +85,7 @@ The project has been converted to a monorepo structure using npm workspaces. The
 - **SolidJS and Tailwind**: The combination of SolidJS and Tailwind CSS allows for rapid UI development.
 - **Real-time Updates**: Pusher provides a simple yet powerful way to implement real-time features.
 - **Type Safety**: End-to-end type safety with tRPC significantly reduces runtime errors and improves developer confidence.
+- **Deno KV TTL**: Deno KV's TTL feature provides an elegant solution for automatic cleanup of stale data without requiring cron jobs or manual maintenance.
 
 ## Current Challenges
 - **Monorepo Integration**: Ensuring smooth integration between Deno (backend) and Node.js (frontend) in the monorepo structure.

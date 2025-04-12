@@ -22,6 +22,7 @@ The project has been converted to a monorepo structure using npm workspaces. The
 - ✅ Player kicking functionality
 - ✅ Join in-progress games
 - ✅ Deno KV integration for state storage
+- ✅ Automatic deletion of inactive rooms after 3 hours using Deno KV's TTL feature
 - ✅ Pusher integration for real-time updates
 - ✅ Environment variable support via .env files
 - ✅ Documentation
@@ -81,7 +82,7 @@ The project has been converted to a monorepo structure using npm workspaces. The
 - Limited testing of real-time functionality
 - No validation for room IDs when joining (could be any string)
 - No limit on the number of players in a room
-- No timeout for inactive players or rooms
+- No timeout for inactive players
 - No persistent storage for game history
 
 ## Evolution of Project Decisions
