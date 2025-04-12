@@ -20,9 +20,14 @@ export enum PusherEvent {
   PLAYER_KICKED = "player-kicked",
 }
 
+// Get presence channel name for a room
+function getPresenceChannelName(roomId: string): string {
+  return `presence-${roomId}`;
+}
+
 // Send room update to all players in the room
 export async function notifyRoomUpdate(room: Room): Promise<void> {
-  await pusher.trigger(room.id, PusherEvent.ROOM_UPDATED, {
+  await pusher.trigger(getPresenceChannelName(room.id), PusherEvent.ROOM_UPDATED, {
     room: sanitizeRoom(room, room.status === "playing"),
   });
 }
@@ -32,7 +37,7 @@ export async function notifyPlayerJoined(room: Room, playerId: string): Promise<
   const player = room.players.find((p) => p.id === playerId);
   if (!player) return;
 
-  await pusher.trigger(room.id, PusherEvent.PLAYER_JOINED, {
+  await pusher.trigger(getPresenceChannelName(room.id), PusherEvent.PLAYER_JOINED, {
     room: sanitizeRoom(room, room.status === "playing"),
     player: {
       id: player.id,
@@ -46,7 +51,7 @@ export async function notifyPlayerJoined(room: Room, playerId: string): Promise<
 export async function notifyPlayerLeft(room: Room | null, playerId: string, playerName: string): Promise<void> {
   if (!room) return;
 
-  await pusher.trigger(room.id, PusherEvent.PLAYER_LEFT, {
+  await pusher.trigger(getPresenceChannelName(room.id), PusherEvent.PLAYER_LEFT, {
     room: sanitizeRoom(room, room.status === "playing"),
     playerId,
     playerName,
@@ -55,17 +60,28 @@ export async function notifyPlayerLeft(room: Room | null, playerId: string, play
 
 // Notify when game starts
 export async function notifyGameStarted(room: Room): Promise<void> {
-  await pusher.trigger(room.id, PusherEvent.GAME_STARTED, {
+  await pusher.trigger(getPresenceChannelName(room.id), PusherEvent.GAME_STARTED, {
     room: sanitizeRoom(room, true),
   });
 }
 
 // Notify when a player is kicked
 export async function notifyPlayerKicked(room: Room, kickedPlayerId: string, kickedPlayerName: string): Promise<void> {
-  await pusher.trigger(room.id, PusherEvent.PLAYER_KICKED, {
+  await pusher.trigger(getPresenceChannelName(room.id), PusherEvent.PLAYER_KICKED, {
     room: sanitizeRoom(room, room.status === "playing"),
     kickedPlayerId,
     kickedPlayerName,
+  });
+}
+
+// Generate Pusher auth signature for presence channels
+export function authorizeChannel(socketId: string, channel: string, playerId: string, playerName: string, isHost: boolean): any {
+  return pusher.authorizeChannel(socketId, channel, {
+    user_id: playerId,
+    user_info: {
+      name: playerName,
+      isHost: isHost
+    }
   });
 }
 

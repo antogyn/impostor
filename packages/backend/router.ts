@@ -143,6 +143,39 @@ export const appRouter = router({
       return { success: true };
     }),
 
+  // Handle player disconnect (from presence channel)
+  handlePlayerDisconnect: publicProcedure
+    .input(
+      z.object({
+        roomId: z.string().uuid(),
+        playerId: z.string().uuid(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Get room and player info before removing
+      const room = await getRoom(input.roomId);
+      if (!room) {
+        return { success: false, error: "Room not found" };
+      }
+      
+      const player = room.players.find(p => p.id === input.playerId);
+      if (!player) {
+        return { success: false, error: "Player not found" };
+      }
+      
+      const playerName = player.name;
+      
+      // Remove player from room
+      const updatedRoom = await removePlayerFromRoom(input.roomId, input.playerId);
+      
+      // Notify other players
+      if (updatedRoom) {
+        await notifyPlayerLeft(updatedRoom, input.playerId, playerName);
+      }
+      
+      return { success: true };
+    }),
+
   // Get room details
   getRoom: publicProcedure
     .input(

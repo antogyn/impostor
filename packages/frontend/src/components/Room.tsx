@@ -234,7 +234,7 @@ export default function Room() {
         <div class={isWaiting() ? "flex space-x-3" : "flex flex-col space-y-4"}>
           <Show when={isHost()}>
             <Button
-              onClick={isWaiting() ? handleStartGame : startGame}
+              onClick={handleStartGame}
               isLoading={isStartingGame()}
               variant="primary"
               fullWidth

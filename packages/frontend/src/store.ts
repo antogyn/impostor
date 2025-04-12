@@ -200,7 +200,9 @@ async function fetchRoomDetails(roomId: string) {
 
 // Subscribe to room updates via Pusher
 function subscribeToRoomUpdates(roomId: string) {
-  subscribeToRoom(roomId, {
+  if (!gameState.playerId) return;
+  
+  subscribeToRoom(roomId, gameState.playerId, {
     onRoomUpdated: (data) => {
       setGameState('room', data.room);
     },
@@ -224,6 +226,14 @@ function subscribeToRoomUpdates(roomId: string) {
       } else {
         setGameState('room', data.room);
       }
+    },
+    onMemberAdded: (member) => {
+      console.log('Member added to presence channel:', member);
+    },
+    onMemberRemoved: (member) => {
+      console.log('Member removed from presence channel:', member);
+      
+      // Disconnections are now handled by the server via webhooks
     },
   });
 }

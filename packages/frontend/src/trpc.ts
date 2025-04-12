@@ -2,7 +2,7 @@ import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import type { AppRouter } from '../../backend/router';
 
 // Define API URL based on environment
-const getBaseUrl = () => {
+export const getBaseUrl = () => {
   // In production, use the deployed API URL
   if (import.meta.env.PROD) {
     return 'https://antogyn-impostor.deno.dev';
