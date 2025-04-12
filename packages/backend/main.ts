@@ -4,6 +4,7 @@ import { appRouter } from "./router.ts";
 import { Context } from "./types.ts";
 import { authorizeChannel, notifyPlayerLeft } from "./pusher.ts";
 import { getRoom, removePlayerFromRoom } from "./kv.ts";
+import { crypto } from "https://deno.land/std@0.190.0/crypto/mod.ts";
 
 // Create context for tRPC requests
 function createContext(): Context {
@@ -161,7 +162,8 @@ async function handler(req: Request): Promise<Response> {
       
       // Verify webhook signature
       const signature = req.headers.get("X-Pusher-Signature") || "";
-      if (!verifyPusherWebhook(body, signature)) {
+      const isValid = await verifyPusherWebhook(body, signature);
+      if (!isValid) {
         return new Response("Invalid signature", { 
           status: 401,
           headers: {
@@ -218,11 +220,44 @@ async function handler(req: Request): Promise<Response> {
 }
 
 // Verify Pusher webhook signature
-function verifyPusherWebhook(body: any, signature: string): boolean {
-  // For development purposes, we'll skip signature verification
-  // In production, you would implement proper HMAC-SHA256 verification
-  console.log("Webhook received, signature verification skipped for development");
-  return true;
+async function verifyPusherWebhook(body: any, signature: string): Promise<boolean> {
+  try {
+    const secret = Deno.env.get("PUSHER_SECRET") || "";
+    if (!secret) {
+      console.error("PUSHER_SECRET environment variable not set");
+      return false;
+    }
+    
+    // Convert body to string
+    const bodyString = JSON.stringify(body);
+    
+    // Create HMAC using the secret
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    
+    // Calculate expected signature
+    const signatureBytes = await crypto.subtle.sign(
+      "HMAC",
+      key,
+      new TextEncoder().encode(bodyString)
+    );
+    
+    // Convert to hex
+    const expectedSignature = Array.from(new Uint8Array(signatureBytes))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    // Compare signatures
+    return expectedSignature === signature;
+  } catch (error) {
+    console.error("Error verifying webhook signature:", error);
+    return false;
+  }
 }
 
 // Handle player disconnection
