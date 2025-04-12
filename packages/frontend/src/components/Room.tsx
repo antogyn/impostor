@@ -1,5 +1,5 @@
 import { For, Show, createSignal } from "solid-js";
-import Button from "./Button";
+import Button from "./Button.tsx";
 import {
   gameState,
   getCurrentPlayer,
@@ -10,11 +10,11 @@ import {
   isHost,
   kickPlayer,
   isKickingPlayer,
-} from "../store";
-import { showToast } from "./Toast";
-import Modal from "./Modal";
-import QRCode from "./QRCode";
-import { useI18n } from "../i18n";
+} from "../store.ts";
+import { showToast } from "./Toast.tsx";
+import Modal from "./Modal.tsx";
+import QRCode from "./QRCode.tsx";
+import { useI18n } from "../i18n/index.ts";
 
 export default function Room() {
   const [showQRModal, setShowQRModal] = createSignal(false);
@@ -152,7 +152,17 @@ export default function Room() {
                 <p class="text-xl font-bold mb-2">
                   {t("room.waitingForNextGame")}
                 </p>
-                <p class="text-sm">{t("room.waitingMessage")}</p>
+                <p class="text-sm mb-2">{t("room.waitingMessage")}</p>
+                <p class="text-xs text-yellow-700 mt-2">
+                  You've joined a game in progress. You'll be assigned a role when the host starts the next game.
+                </p>
+                <Show when={isHost()}>
+                  <div class="mt-3 p-2 bg-white rounded-md border border-yellow-200">
+                    <p class="text-sm text-gray-700">
+                      As the host, you can restart the game to include all players.
+                    </p>
+                  </div>
+                </Show>
               </div>
             </Show>
 

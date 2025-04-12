@@ -1,7 +1,7 @@
 import Pusher from 'pusher-js';
-import { PusherEvent } from './types';
-import { trpc, getBaseUrl } from './trpc';
-import { isHost } from './store';
+import { PusherEvent } from './types.ts';
+import { trpc, getBaseUrl } from './trpc.ts';
+import { isHost } from './store.ts';
 
 // Initialize Pusher with environment variables or default values
 const pusherKey = import.meta.env.VITE_PUSHER_KEY || 'your-pusher-key';
@@ -130,3 +130,22 @@ export function unsubscribeFromRoom(roomId: string) {
 }
 
 // Player disconnections are now handled by the server via webhooks
+
+// Set up connection monitoring to detect and handle disconnections
+export function setupConnectionMonitoring(onDisconnect: () => void) {
+  // Listen for connection events
+  pusher.connection.bind('state_change', (states: { current: string }) => {
+    if (states.current === 'disconnected' || states.current === 'failed') {
+      console.log('Pusher connection lost, attempting to reconnect...');
+      onDisconnect();
+    }
+  });
+  
+  // Set up periodic ping (every 30 seconds)
+  setInterval(() => {
+    if (pusher.connection.state !== 'connected') {
+      console.log('Periodic check: Pusher not connected, attempting to reconnect...');
+      onDisconnect();
+    }
+  }, 30000);
+}

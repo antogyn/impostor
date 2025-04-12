@@ -1,21 +1,57 @@
 import { Component, createEffect, createSignal, onMount, Show } from "solid-js";
-import Home from "./components/Home";
-import Room from "./components/Room";
-import JoinRoom from "./components/JoinRoom";
-import LanguageSelector from "./components/LanguageSelector";
-import { gameState } from "./store";
-import { I18nContext, createI18nProvider } from "./i18n/index";
+import Home from "./components/Home.tsx";
+import Room from "./components/Room.tsx";
+import JoinRoom from "./components/JoinRoom.tsx";
+import LanguageSelector from "./components/LanguageSelector.tsx";
+import { gameState, loadSession, clearSession, attemptReconnection, initConnectionMonitoring } from "./store.ts";
+import { I18nContext, createI18nProvider } from "./i18n/index.ts";
+import { showToast } from "./components/Toast.tsx";
 
 const App: Component = () => {
   const [roomIdFromUrl, setRoomIdFromUrl] = createSignal<string | null>(null);
+  const [isReconnecting, setIsReconnecting] = createSignal(false);
 
-  // Check for roomId in URL when component mounts
-  onMount(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get("roomId");
-    if (roomId) {
-      setRoomIdFromUrl(roomId);
+  // Handle reconnection and URL parameters when component mounts
+  onMount(async () => {
+    // If not already in a room
+    if (!gameState.room) {
+      // First check for roomId in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomIdParam = urlParams.get("roomId");
+      
+      const session = loadSession();
+
+      if (roomIdParam && session?.roomId !== roomIdParam) {
+        // URL parameter takes precedence - clear any existing session
+        clearSession();
+        setRoomIdFromUrl(roomIdParam);
+      } else {
+        // No URL parameter, try to reconnect from saved session
+        const session = loadSession();
+        
+        if (session) {
+          // We have a saved session, attempt to reconnect
+          setIsReconnecting(true);
+          
+          const success = await attemptReconnection(
+            session.roomId,
+            session.playerId,
+            session.playerName
+          );
+          
+          if (success) {
+            showToast("Reconnected to game", "success");
+          } else {
+            showToast("Previous session expired", "error");
+          }
+          
+          setIsReconnecting(false);
+        }
+      }
     }
+    
+    // Initialize connection monitoring to handle "zombie state" scenarios
+    initConnectionMonitoring();
   });
 
   // Log game state changes for debugging
@@ -33,11 +69,24 @@ const App: Component = () => {
           <LanguageSelector />
         </div>
 
-        <Show when={!gameState.room && !roomIdFromUrl()}>
+        <Show when={isReconnecting()}>
+          <div class="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
+            <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md text-center">
+              <h1 class="text-xl font-bold text-gray-900 mb-4">Reconnecting...</h1>
+              <p class="text-gray-600 mb-2">Attempting to reconnect to your previous game session.</p>
+              <p class="text-gray-500 text-sm">If you were disconnected for a while, you may rejoin as a new player.</p>
+              <div class="mt-4">
+                <div class="w-8 h-8 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin mx-auto"></div>
+              </div>
+            </div>
+          </div>
+        </Show>
+
+        <Show when={!isReconnecting() && !gameState.room && !roomIdFromUrl()}>
           <Home />
         </Show>
 
-        <Show when={!gameState.room && roomIdFromUrl()}>
+        <Show when={!isReconnecting() && !gameState.room && roomIdFromUrl()}>
           <div class="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
             <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
               <h1 class="text-3xl font-bold text-center text-gray-900 mb-6">
@@ -59,7 +108,7 @@ const App: Component = () => {
           </div>
         </Show>
 
-        <Show when={gameState.room}>
+        <Show when={!isReconnecting() && gameState.room}>
           <Room />
         </Show>
       </div>
