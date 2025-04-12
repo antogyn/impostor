@@ -14,6 +14,8 @@ export interface Room {
   gameCount: number;
   language: 'en' | 'fr';
   word?: string;
+  startingPlayerId?: string;         // New field to track the starting player
+  disallowImpostorStart: boolean;    // New field to prevent impostor from being starting player
 }
 
 // For now, we'll just define a placeholder AppRouter type

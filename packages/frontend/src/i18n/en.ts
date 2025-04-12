@@ -40,6 +40,7 @@ export default {
     impostorDescription: "Try to blend in and avoid being detected!",
     crewmateDescription: "Work with other crewmates to find the impostor!",
     theWordIs: "The word is:",
+    startingPlayer: "Starting Player",
   },
   createRoom: {
     title: "Create a Room",
@@ -49,6 +50,7 @@ export default {
     createRoom: "Create Room",
     failedToCreate: "Failed to create room",
     gameLanguage: "Game Language",
+    disallowImpostorStart: "Prevent impostor from being the starting player",
   },
   joinRoom: {
     title: "Join a Room",

@@ -34,12 +34,20 @@ export function getCurrentPlayer(): Player | undefined {
 }
 
 // Create a new room
-export async function createRoom(playerName: string, language: 'en' | 'fr' = 'en') {
+export async function createRoom(
+  playerName: string, 
+  language: 'en' | 'fr' = 'en',
+  disallowImpostorStart: boolean = false
+) {
   setIsCreatingRoom(true);
   setGameState('error', null);
   
   try {
-    const result = await trpc.createRoom.mutate({ playerName, language });
+    const result = await trpc.createRoom.mutate({ 
+      playerName, 
+      language,
+      disallowImpostorStart
+    });
     
     // Save player info
     setGameState({

@@ -40,6 +40,7 @@ export default {
     impostorDescription: "Essayez de vous fondre dans la masse et d'éviter d'être détecté !",
     crewmateDescription: "Collaborez avec les autres membres d'équipage pour trouver l'imposteur !",
     theWordIs: "Le mot est :",
+    startingPlayer: "Joueur de Départ",
   },
   createRoom: {
     title: "Créer une Salle",
@@ -49,6 +50,7 @@ export default {
     createRoom: "Créer une Salle",
     failedToCreate: "Échec de la création de la salle",
     gameLanguage: "Langue du Jeu",
+    disallowImpostorStart: "Empêcher l'imposteur d'être le joueur de départ",
   },
   joinRoom: {
     title: "Rejoindre une Salle",

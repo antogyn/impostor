@@ -78,6 +78,8 @@ function sanitizeRoom(room: Room, includeRoles = false): Partial<Room> {
     gameCount: room.gameCount,
     language: room.language,
     word: includeRoles ? room.word : undefined,
+    startingPlayerId: room.startingPlayerId,
+    disallowImpostorStart: room.disallowImpostorStart,
     players: room.players.map((player) => ({
       id: player.id,
       name: player.name,

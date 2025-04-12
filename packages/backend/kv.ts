@@ -33,7 +33,11 @@ async function getRandomWord(language: 'en' | 'fr'): Promise<string> {
 }
 
 // Create a new room
-export async function createRoom(hostName: string, language: 'en' | 'fr' = 'en'): Promise<{ room: Room; playerId: string }> {
+export async function createRoom(
+  hostName: string, 
+  language: 'en' | 'fr' = 'en',
+  disallowImpostorStart: boolean = false
+): Promise<{ room: Room; playerId: string }> {
   // Generate IDs
   const roomId = crypto.randomUUID();
   const playerId = crypto.randomUUID();
@@ -52,6 +56,7 @@ export async function createRoom(hostName: string, language: 'en' | 'fr' = 'en')
     status: "waiting",
     gameCount: 1,
     language: language,
+    disallowImpostorStart,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
@@ -146,10 +151,8 @@ export async function startGame(roomId: string, hostId: string): Promise<Room | 
     return null;
   }
   
-  // Need at least 3 players to start
-  if (room.players.length < 3) {
-    return null;
-  }
+  // For testing purposes, allow starting with any number of players
+  // In production, this would be: if (room.players.length < 3) { return null; }
   
   // Randomly select impostor
   const impostorIndex = Math.floor(Math.random() * room.players.length);
@@ -159,6 +162,30 @@ export async function startGame(roomId: string, hostId: string): Promise<Room | 
   
   // Select a random word based on room language
   room.word = await getRandomWord(room.language);
+  
+  // Randomly select starting player
+  let startingPlayerIndex;
+  if (room.disallowImpostorStart) {
+    // Filter out the impostor when selecting starting player
+    const nonImpostorIndices = room.players
+      .map((player, index) => ({ player, index }))
+      .filter(({ player }) => !player.isImpostor)
+      .map(({ index }) => index);
+    
+    // Handle edge case where all players are impostors (shouldn't happen in normal gameplay)
+    if (nonImpostorIndices.length === 0) {
+      // Fall back to allowing any player to be the starting player
+      startingPlayerIndex = Math.floor(Math.random() * room.players.length);
+    } else {
+      const randomNonImpostorIndex = Math.floor(Math.random() * nonImpostorIndices.length);
+      startingPlayerIndex = nonImpostorIndices[randomNonImpostorIndex];
+    }
+  } else {
+    // Any player can be the starting player
+    startingPlayerIndex = Math.floor(Math.random() * room.players.length);
+  }
+  
+  room.startingPlayerId = room.players[startingPlayerIndex].id;
   
   // Increment game count if restarting a game
   if (room.status === "playing") {

@@ -23,10 +23,15 @@ export const appRouter = router({
       z.object({
         playerName: z.string().min(1).max(20),
         language: z.enum(['en', 'fr']).default('en'),
+        disallowImpostorStart: z.boolean().default(false),
       })
     )
     .mutation(async ({ input }) => {
-      const { room, playerId } = await createRoom(input.playerName, input.language);
+      const { room, playerId } = await createRoom(
+        input.playerName, 
+        input.language,
+        input.disallowImpostorStart
+      );
       return { roomId: room.id, playerId };
     }),
 
@@ -163,6 +168,10 @@ export const appRouter = router({
           id: room.id,
           status: room.status,
           gameCount: room.gameCount,
+          language: room.language,
+          startingPlayerId: room.startingPlayerId,
+          disallowImpostorStart: room.disallowImpostorStart,
+          word: player.id === input.playerId && !player.isImpostor ? room.word : undefined,
           players: room.players.map((p) => ({
             id: p.id,
             name: p.name,
@@ -177,6 +186,9 @@ export const appRouter = router({
         id: room.id,
         status: room.status,
         gameCount: room.gameCount,
+        language: room.language,
+        startingPlayerId: room.startingPlayerId,
+        disallowImpostorStart: room.disallowImpostorStart,
         players: room.players.map((p) => ({
           id: p.id,
           name: p.name,

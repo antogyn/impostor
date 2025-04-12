@@ -11,6 +11,7 @@ interface CreateRoomProps {
 export default function CreateRoom(props: CreateRoomProps) {
   const [playerName, setPlayerName] = createSignal('');
   const [language, setLanguage] = createSignal<'en' | 'fr'>('en');
+  const [disallowImpostorStart, setDisallowImpostorStart] = createSignal(false);
   const [error, setError] = createSignal('');
   const { t } = useI18n();
 
@@ -23,7 +24,11 @@ export default function CreateRoom(props: CreateRoomProps) {
     }
     
     setError('');
-    const roomId = await createRoom(playerName().trim(), language());
+    const roomId = await createRoom(
+      playerName().trim(), 
+      language(),
+      disallowImpostorStart()
+    );
     
     if (!roomId) {
       setError(gameState.error || t('createRoom.failedToCreate'));
@@ -77,6 +82,19 @@ export default function CreateRoom(props: CreateRoomProps) {
               <span class="ml-2">Français</span>
             </label>
           </div>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              class="form-checkbox"
+              checked={disallowImpostorStart()}
+              onChange={(e) => setDisallowImpostorStart(e.target.checked)}
+              disabled={isCreatingRoom()}
+            />
+            <span class="ml-2 text-sm">{t('createRoom.disallowImpostorStart')}</span>
+          </label>
         </div>
         
         <div class="flex space-x-3">

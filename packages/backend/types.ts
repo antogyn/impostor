@@ -18,6 +18,7 @@ export interface Context {
 export interface CreateRoomInput {
   playerName: string;
   language: 'en' | 'fr';
+  disallowImpostorStart: boolean;
 }
 
 export interface JoinRoomInput {
