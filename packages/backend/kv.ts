@@ -94,9 +94,8 @@ export async function addPlayerToRoom(
   };
 
   // If game is in progress, player will not have a role until the game is restarted
-  if (room.status === "playing") {
-    player.isImpostor = false; // Default value, will be reassigned when game restarts
-  }
+  // We intentionally don't set isImpostor here to prevent players from seeing the word
+  // until they've been assigned a proper role in the next game
 
   // Add player to room
   room.players.push(player);

@@ -218,7 +218,7 @@ export const appRouter = router({
             language: room.language,
             startingPlayerId: room.startingPlayerId,
             disallowImpostorStart: room.disallowImpostorStart,
-            word: player.id === input.playerId && !player.isImpostor
+            word: player.id === input.playerId && player.isImpostor === false
               ? room.word
               : undefined,
             players: room.players.map((p) => ({

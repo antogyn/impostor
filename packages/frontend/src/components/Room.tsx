@@ -153,9 +153,6 @@ export default function Room() {
                   {t("room.waitingForNextGame")}
                 </p>
                 <p class="text-sm mb-2">{t("room.waitingMessage")}</p>
-                <p class="text-xs text-yellow-700 mt-2">
-                  You've joined a game in progress. You'll be assigned a role when the host starts the next game.
-                </p>
                 <Show when={isHost()}>
                   <div class="mt-3 p-2 bg-white rounded-md border border-yellow-200">
                     <p class="text-sm text-gray-700">
