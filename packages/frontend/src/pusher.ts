@@ -1,54 +1,60 @@
-import Pusher from 'pusher-js';
-import { PusherEvent } from './types.ts';
-import { trpc, getBaseUrl } from './trpc.ts';
-import { isHost } from './store.ts';
+import Pusher from "pusher-js";
+import { PusherEvent } from "./types.ts";
+import { getBaseUrl } from "./trpc.ts";
+import { createSignal } from "solid-js";
 
 // Initialize Pusher with environment variables or default values
-const pusherKey = import.meta.env.VITE_PUSHER_KEY || 'your-pusher-key';
-const pusherCluster = import.meta.env.VITE_PUSHER_CLUSTER || 'eu';
+const pusherKey = import.meta.env.VITE_PUSHER_KEY || "your-pusher-key";
+const pusherCluster = import.meta.env.VITE_PUSHER_CLUSTER || "eu";
 const apiUrl = getBaseUrl();
 
+export const [isPlayed, setPlayerIsSubscribed] = createSignal(false);
+
 // Store the current player ID for auth
-let currentPlayerId = '';
+let currentPlayerId = "";
 
 // Create a custom authorizer function
 const authorizer = (channel: any, options: any) => {
   return {
-    authorize: (socketId: string, callback: (error: any, authData: any) => void) => {
+    authorize: (
+      socketId: string,
+      callback: (error: any, authData: any) => void,
+    ) => {
       // Create a form for the auth request
       const formData = new FormData();
-      formData.append('socket_id', socketId);
-      formData.append('channel_name', channel.name);
-      
+      formData.append("socket_id", socketId);
+      formData.append("channel_name", channel.name);
+
       // Make the auth request
       fetch(`${apiUrl}/pusher/auth`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'X-Player-ID': currentPlayerId
+          "X-Player-ID": currentPlayerId,
         },
-        body: formData
+        body: formData,
       })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        callback(null, data);
-      })
-      .catch(error => {
-        callback(error, null);
-      });
-    }
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          callback(null, data);
+        })
+        .catch((error) => {
+          callback(error, null);
+        });
+    },
   };
 };
 
 // Create Pusher instance with custom authorizer
 export const pusher = new Pusher(pusherKey, {
   cluster: pusherCluster,
-  authorizer: authorizer
+  authorizer: authorizer,
 });
+
 
 // Get presence channel name for a room
 function getPresenceChannelName(roomId: string): string {
@@ -67,36 +73,45 @@ export function subscribeToRoom(roomId: string, playerId: string, callbacks: {
 }) {
   // Use presence channel format
   const channelName = getPresenceChannelName(roomId);
-  
+
   // Set the current player ID for auth
   currentPlayerId = playerId;
-  
+
+  const alreadyExistingChannel = pusher.channel(channelName);
+
+  if (alreadyExistingChannel) {
+    console.log("Player already subscribed.")
+    return alreadyExistingChannel;
+  }
+
+  console.log("Subscribing player...")
+
   // Subscribe to presence channel
   const channel = pusher.subscribe(channelName);
-  
+
   // Handle subscription events
-  channel.bind('pusher:subscription_succeeded', () => {
-    console.log('Successfully subscribed to presence channel');
+  channel.bind("pusher:subscription_succeeded", () => {
+    console.log("Successfully subscribed to presence channel");
   });
-  
-  channel.bind('pusher:subscription_error', (error: any) => {
-    console.error('Pusher subscription error:', error);
+
+  channel.bind("pusher:subscription_error", (error: any) => {
+    console.error("Pusher subscription error:", error);
   });
-  
+
   // Set up presence events
-  channel.bind('pusher:member_added', (member: any) => {
-    console.log('Member added:', member);
+  channel.bind("pusher:member_added", (member: any) => {
+    console.log("Member added:", member);
     if (callbacks.onMemberAdded) {
       callbacks.onMemberAdded(member);
     }
   });
-  
-  channel.bind('pusher:member_removed', (member: any) => {
-    console.log('Member removed:', member);
+
+  channel.bind("pusher:member_removed", (member: any) => {
+    console.log("Member removed:", member);
     if (callbacks.onMemberRemoved) {
       callbacks.onMemberRemoved(member);
     }
-    
+
     // Disconnections are now handled by the server via webhooks
   });
 
@@ -127,25 +142,4 @@ export function subscribeToRoom(roomId: string, playerId: string, callbacks: {
 // Unsubscribe from a channel (room)
 export function unsubscribeFromRoom(roomId: string) {
   pusher.unsubscribe(getPresenceChannelName(roomId));
-}
-
-// Player disconnections are now handled by the server via webhooks
-
-// Set up connection monitoring to detect and handle disconnections
-export function setupConnectionMonitoring(onDisconnect: () => void) {
-  // Listen for connection events
-  pusher.connection.bind('state_change', (states: { current: string }) => {
-    if (states.current === 'disconnected' || states.current === 'failed') {
-      console.log('Pusher connection lost, attempting to reconnect...');
-      onDisconnect();
-    }
-  });
-  
-  // Set up periodic ping (every 30 seconds)
-  setInterval(() => {
-    if (pusher.connection.state !== 'connected') {
-      console.log('Periodic check: Pusher not connected, attempting to reconnect...');
-      onDisconnect();
-    }
-  }, 30000);
 }

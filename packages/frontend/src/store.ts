@@ -296,7 +296,7 @@ export async function attemptReconnection(
     const userIsInTheRoom = room.players.findIndex((player) =>
       player.id === playerId
     ) >= 0;
-    
+
     if (userIsInTheRoom) {
       // If this succeeds, the player is still in the room
       setGameState({
@@ -309,6 +309,7 @@ export async function attemptReconnection(
       subscribeToRoomUpdates(roomId);
       saveSession();
 
+      showToast("Game resumed", "success");
       console.log("Successfully reconnected to existing player session");
       return true;
     } else {
@@ -345,36 +346,17 @@ export async function attemptReconnection(
 
 // Set up connection monitoring to detect and handle disconnections
 export function initConnectionMonitoring() {
-  // Set up Pusher connection monitoring
-  setupConnectionMonitoring(() => {
-    if (gameState.room && gameState.playerId && gameState.playerName) {
-      console.log("Connection lost, attempting to reconnect...");
-      attemptReconnection(
-        gameState.room.id,
-        gameState.playerId,
-        gameState.playerName,
-      );
-    }
-  });
-
   // Set up visibility change detection
   if (typeof document !== "undefined") {
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
-        console.log("Page became visible, checking connection...");
+        console.log("Page became visible, attempt reconnection...");
         if (gameState.room && gameState.playerId && gameState.playerName) {
-          // Check if we're still connected by making a lightweight request
-          trpc.getRoom.query({
-            roomId: gameState.room.id,
-            playerId: gameState.playerId,
-          }).catch(() => {
-            console.log("Connection check failed, attempting to reconnect...");
-            attemptReconnection(
-              gameState.room.id,
-              gameState.playerId,
-              gameState.playerName,
-            );
-          });
+          attemptReconnection(
+            gameState.room.id,
+            gameState.playerId,
+            gameState.playerName,
+          );
         }
       }
     });
