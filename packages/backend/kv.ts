@@ -90,7 +90,7 @@ export async function addPlayerToRoom(
   const player: Player = {
     id: playerId,
     name: playerName,
-    isHost: false,
+    isHost: room.players.length === 0, // Make first player the host if room is empty
   };
 
   // If game is in progress, player will not have a role until the game is restarted
