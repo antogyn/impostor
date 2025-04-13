@@ -210,27 +210,25 @@ export const appRouter = router({
       // If game is in progress and playerId is provided, include role information for that player only
       if (room.status === "playing" && input.playerId) {
         const player = room.players.find((p) => p.id === input.playerId);
-        if (!player) {
-          throw new Error("Player not found in room");
+        if (player) {
+          return {
+            id: room.id,
+            status: room.status,
+            gameCount: room.gameCount,
+            language: room.language,
+            startingPlayerId: room.startingPlayerId,
+            disallowImpostorStart: room.disallowImpostorStart,
+            word: player.id === input.playerId && !player.isImpostor
+              ? room.word
+              : undefined,
+            players: room.players.map((p) => ({
+              id: p.id,
+              name: p.name,
+              isHost: p.isHost,
+              isImpostor: p.id === input.playerId ? p.isImpostor : undefined,
+            })),
+          };
         }
-
-        return {
-          id: room.id,
-          status: room.status,
-          gameCount: room.gameCount,
-          language: room.language,
-          startingPlayerId: room.startingPlayerId,
-          disallowImpostorStart: room.disallowImpostorStart,
-          word: player.id === input.playerId && !player.isImpostor
-            ? room.word
-            : undefined,
-          players: room.players.map((p) => ({
-            id: p.id,
-            name: p.name,
-            isHost: p.isHost,
-            isImpostor: p.id === input.playerId ? p.isImpostor : undefined,
-          })),
-        };
       }
 
       // Otherwise, return room without role information
