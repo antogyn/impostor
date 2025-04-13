@@ -72,7 +72,7 @@ export default function Room() {
   };
 
   const currentPlayer = () => getCurrentPlayer();
-  const hasRole = () => currentPlayer()?.isImpostor !== undefined;
+  const hasRole = () => currentPlayer()?.isPlaying;
   const isImpostor = () => currentPlayer()?.isImpostor || false;
 
   const getStartingPlayer = () => {
@@ -219,18 +219,41 @@ export default function Room() {
                     )}
                   </div>
 
-                  <Show when={isHost() && player.id !== gameState.playerId}>
-                    <Button
-                      onClick={() => handleKickPlayer(player.id)}
-                      variant="danger"
-                      size="sm"
-                      isLoading={
-                        isKickingPlayer() && kickingPlayerId() === player.id
-                      }
-                    >
-                      {t("room.kick")}
-                    </Button>
-                  </Show>
+                  <div class="flex items-center">
+                    {/* Player status indicator - only shown during game */}
+                    <Show when={isPlaying()}>
+                      <span class={`mr-3 flex items-center ${player.isPlaying ? 'text-green-600' : 'text-amber-600'}`}>
+                        {player.isPlaying ? (
+                          <span title={t("room.playerActive")} class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-xs ml-1">{t("room.playing")}</span>
+                          </span>
+                        ) : (
+                          <span title={t("room.playerWaiting")} class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-xs ml-1">{t("room.waiting")}</span>
+                          </span>
+                        )}
+                      </span>
+                    </Show>
+                    
+                    <Show when={isHost() && player.id !== gameState.playerId}>
+                      <Button
+                        onClick={() => handleKickPlayer(player.id)}
+                        variant="danger"
+                        size="sm"
+                        isLoading={
+                          isKickingPlayer() && kickingPlayerId() === player.id
+                        }
+                      >
+                        {t("room.kick")}
+                      </Button>
+                    </Show>
+                  </div>
                 </li>
               )}
             </For>

@@ -225,7 +225,8 @@ export const appRouter = router({
               id: p.id,
               name: p.name,
               isHost: p.isHost,
-              isImpostor: p.id === input.playerId ? p.isImpostor : undefined,
+              isPlaying: p.isPlaying, // Include isPlaying for all players
+              isImpostor: p.id === input.playerId ? p.isImpostor : undefined, // Only include isImpostor for current player
             })),
           };
         }
@@ -243,6 +244,7 @@ export const appRouter = router({
           id: p.id,
           name: p.name,
           isHost: p.isHost,
+          isPlaying: p.isPlaying, // Include isPlaying for all players
         })),
       };
     }),

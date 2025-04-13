@@ -101,6 +101,7 @@ function sanitizeRoom(room: Room, includeRoles = false): Partial<Room> {
       name: player.name,
       isHost: player.isHost,
       ...(includeRoles ? { isImpostor: player.isImpostor } : {}),
+      isPlaying: player.isPlaying,
     })),
   };
 }

@@ -41,6 +41,10 @@ export default {
     crewmateDescription: "Collaborez avec les autres membres d'équipage pour trouver l'imposteur !",
     theWordIs: "Le mot est :",
     startingPlayer: "Joueur de Départ",
+    playing: "En jeu",
+    waiting: "En attente",
+    playerActive: "Joueur actif dans la partie en cours",
+    playerWaiting: "Joueur en attente de la prochaine partie",
   },
   createRoom: {
     title: "Créer une Salle",

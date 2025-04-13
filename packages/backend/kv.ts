@@ -54,6 +54,7 @@ export async function createRoom(
     id: playerId,
     name: hostName,
     isHost: true,
+    isPlaying: false, // Initially not playing until game starts
   };
 
   // Create room
@@ -91,6 +92,7 @@ export async function addPlayerToRoom(
     id: playerId,
     name: playerName,
     isHost: room.players.length === 0, // Make first player the host if room is empty
+    isPlaying: false, // Initially not playing until game is restarted
   };
 
   // If game is in progress, player will not have a role until the game is restarted
@@ -166,10 +168,11 @@ export async function startGame(
   // For testing purposes, allow starting with any number of players
   // In production, this would be: if (room.players.length < 3) { return null; }
 
-  // Randomly select impostor
+  // Randomly select impostor and set all players to playing
   const impostorIndex = Math.floor(Math.random() * room.players.length);
   room.players.forEach((player, index) => {
     player.isImpostor = index === impostorIndex;
+    player.isPlaying = true; // Mark all players as playing in this game
   });
 
   // Select a random word based on room language

@@ -41,6 +41,10 @@ export default {
     crewmateDescription: "Work with other crewmates to find the impostor!",
     theWordIs: "The word is:",
     startingPlayer: "Starting Player",
+    playing: "Playing",
+    waiting: "Waiting",
+    playerActive: "Player is active in the current game",
+    playerWaiting: "Player is waiting for the next game",
   },
   createRoom: {
     title: "Create a Room",

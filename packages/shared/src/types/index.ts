@@ -5,6 +5,7 @@ export interface Player {
   name: string;
   isHost: boolean;
   isImpostor?: boolean;
+  isPlaying: boolean; // New field to explicitly track if player is in current game
 }
 
 export interface Room {
